@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>Multiroom Chat</title>
+		
+		<!-- bootstrap - link cdn -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	
+		<!-- estilo -->
+		<link href="css/style.css" rel="stylesheet">
+		
+		<script type="text/javascript">
+		</script>
+	</head>
+
+	<body>
+	
+	
+		<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Multiroom Chat</a>
+				</div>
+				
+				
+				<div class="collapse navbar-collapse" id="navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="#" id="exibe_chat">Chat</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<div class="container">
+            <div class="row conversa" id="conversa">
+				<div class="col-md-1"></div>
+				<div class="col-md-10" id="dialogs">
+				</div>
+				<div class="col-md-1"></div>
+                
+            </div>
+        </div>
+		
+		<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+			<div class="container">
+				<div class="panel-body campo-mensagem">
+				<input type="hidden" value="<%=apelido%>" id="apelido">
+					<form onsubmit="sendMessage(event)" id="messageForm">
+						<div class="col-md-12">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Mensagem" id="msg">
+								<span class="input-group-btn">
+									<input type="submit" class="btn btn-default" value=">">></input>
+								</span>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</nav>		
+		
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<script src="/socket.io/socket.io.js"> </script>
+		<script>
+			var socket = io('http://localhost');
+			socket.on('msgToClient', function(data){
+				var $dialogos = document.querySelector('#dialogs')
+				$dialogos.insertAdjacentHTML('beforeend', data.msg);
+				window.scrollTo(0, document.body.scrollHeight)
+			})
+			function sendMessage(e){
+				e.preventDefault();
+				var apelido = document.querySelector('#apelido').getAttribute('value')
+				var msg = e.currentTarget[0].value;
+				if(!msg){
+					alert('Preencha o campo de mensagem')
+					return;
+				}
+				socket.emit(
+					'msgToServer',
+					{apelido: apelido, msg: msg}
+				)
+				e.target.reset()
+			}
+		</script>
+	</body>
+</html>
